@@ -1,0 +1,33 @@
+
+find patches -type f | shuf -n 8
+
+python train-dcgan.py --dataset ./data/general/patches --batch_size 512 --epoch 20
+
+
+nohup ./train.sh >mynohup.out 2>&1 &
+
+
+#to prepare test images
+python prepareApply.py ./data/general/apply/*.jpg  --outDir ./data/general/apply
+
+# to run the reconstruction
+#python complete_realCase.py ./data/general/apply/image_0101_corrupted_patches --outDir outputImages
+
+python complete_realCase.py ./data/general/apply/simple_single_test --outDir outputSimplePatches
+
+# to run the simple discriminator GAN
+#python train-dcgan.py --dataset ./data/general/simple_patches --batch_size 64 --epoch 20 --checkpoint_dir simple_checkpoint
+python train-dcgan.py --dataset ./data/general/simple_patches --batch_size 1000 --learning_rate 0.005 --epoch 15 --checkpoint_dir simple_checkpoint
+
+
+# to run on 8** patches
+python complete_realCase.py ./data/general/apply/simple_single_test_88/ --imgSize 8 --checkpointDir simple_checkpoint --maskType random --momentum 0.0 --outDir outputSimplePatches88
+
+# to complete 8*8 patches
+python complete_simple.py ./data/general/apply/simple_single_test_88/*.jpg --imgSize 8 --checkpointDir simple_checkpoint --maskType full --momentum 0.0 --nIter 1000 --lam 1.0 --outDir outputImg88
+
+
+
+
+
+
